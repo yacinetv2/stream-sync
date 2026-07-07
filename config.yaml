@@ -1,0 +1,12 @@
+workers: 900
+
+watch_path: "/home/pankaj-dev/stream/tmp/live"
+
+playlist: "index.m3u8"
+
+r2:
+  endpoint: "https://f9cae64fe5a0b435369597e5750a8de1.r2.cloudflarestorage.com"
+  bucket: "yacine"
+  access_key: "e7dfc53e3b6eef4f061209e4f974a289"
+  secret_key: "860a1a19e161a77e57cee7717140c28682032c936db4bfc59da6303b4fab2efd"
+  public_url: "http://cdn.ycncdn.online"

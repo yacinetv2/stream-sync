@@ -1,0 +1,28 @@
+package playlist
+
+import (
+ "log"
+ "path/filepath"
+ "time"
+)
+
+func StartLoop(uploader *Uploader, channelPaths []string) {
+
+ go func() {
+
+  ticker := time.NewTicker(2 * time.Second)
+  defer ticker.Stop()
+
+  for range ticker.C {
+
+   for _, chPath := range channelPaths {
+
+    channel := filepath.Base(chPath)
+
+    if err := uploader.UploadPlaylist(channel); err != nil {
+     log.Printf("Playlist update failed: %s: %v", channel, err)
+    }
+   }
+  }
+ }()
+}
