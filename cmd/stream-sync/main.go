@@ -36,7 +36,7 @@ func main() {
 
  uploader := playlist.NewUploader(client, cfg)
 
- pool := worker.New(client, q, uploaded, pq)
+ pool := worker.New(client, q, uploaded, pq, cfg.R2.Bucket)
  pool.Start(cfg.Workers)
 
  channels, err := channel.List(cfg.WatchPath)
