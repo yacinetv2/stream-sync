@@ -11,26 +11,26 @@ import (
  "stream-sync/internal/r2"
 )
 
-const RcloneRemote = "r2:yacine"
-
 type Pool struct {
  Client        *r2.Client
  Queue         *queue.Queue
  Uploaded      *cache.Uploaded
  PlaylistQueue *queue.PlaylistQueue
+ Bucket        string
 }
 
-func New(client *r2.Client, q *queue.Queue, uploaded *cache.Uploaded, pq *queue.PlaylistQueue) *Pool {
+func New(client *r2.Client, q *queue.Queue, uploaded *cache.Uploaded, pq *queue.PlaylistQueue, bucket string) *Pool {
  return &Pool{
   Client:        client,
   Queue:         q,
   Uploaded:      uploaded,
   PlaylistQueue: pq,
+  Bucket:        bucket,
  }
 }
 
-func uploadWithRclone(localPath, remoteKey string) error {
- dst := RcloneRemote + "/" + remoteKey
+func uploadWithRclone(localPath, remoteKey, bucket string) error {
+ dst := fmt.Sprintf("r2:%s/%s", bucket, remoteKey)
 
  cmd := exec.Command(
   "rclone",
@@ -65,13 +65,12 @@ func (p *Pool) Start(workers int) {
 
     log.Printf("[Worker %d] rclone uploading %s", id, job.RemoteKey)
 
-    if err := uploadWithRclone(job.LocalPath, job.RemoteKey); err != nil {
+    if err := uploadWithRclone(job.LocalPath, job.RemoteKey, p.Bucket); err != nil {
      log.Printf("[Worker %d] rclone upload failed: %s: %v", id, job.RemoteKey, err)
      continue
     }
 
     fileName := filepath.Base(job.RemoteKey)
-
     p.Uploaded.Add(job.Channel, fileName, 0)
 
     log.Printf("[Worker %d] rclone uploaded: %s", id, job.RemoteKey)
